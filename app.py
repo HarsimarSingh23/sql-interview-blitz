@@ -43,6 +43,23 @@ def get_connection():
 
 con = get_connection()
 
+# ── Helper: Show table previews ──
+def show_table_previews():
+    """Render expandable table previews."""
+    st.markdown("---")
+    st.subheader("📊 Quick Table Reference")
+    tables = ["customers", "products", "orders", "order_items", "employees", "monthly_metrics"]
+    cols = st.columns(3)
+    for i, table in enumerate(tables):
+        with cols[i % 3]:
+            with st.expander(f"🗂️ {table}"):
+                try:
+                    df = con.execute(f"SELECT * FROM {table}").fetchdf()
+                    st.caption(f"{len(df)} rows × {len(df.columns)} cols")
+                    st.dataframe(df, use_container_width=True, height=250)
+                except Exception as e:
+                    st.error(str(e))
+
 # ── Session state ──
 if "score" not in st.session_state:
     st.session_state.score = {}
@@ -91,7 +108,12 @@ tab1, tab2, tab3, tab4 = st.tabs(["📝 Questions", "🔍 Free SQL Editor", "�
 # ═══════════════════════ TAB 1: Questions ═══════════════════════
 with tab1:
     st.header("SQL Interview Questions")
-    
+
+    # Show/hide table data
+    if st.toggle("👀 Show Table Data", key="show_tables_q", value=False):
+        show_table_previews()
+        st.markdown("---")
+
     filtered = QUESTIONS
     if selected_topic != "All":
         filtered = [q for q in filtered if q["topic"] == selected_topic]
@@ -163,6 +185,11 @@ with tab1:
 with tab2:
     st.header("🔍 Free SQL Editor")
     st.markdown("Run any SQL query against the loaded tables.")
+
+    # Show/hide table data
+    if st.toggle("👀 Show Table Data", key="show_tables_editor", value=False):
+        show_table_previews()
+        st.markdown("---")
 
     free_sql = st.text_area("SQL Query:", height=200, key="free_sql",
                              placeholder="SELECT * FROM customers LIMIT 5;")
