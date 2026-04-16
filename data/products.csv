@@ -1,0 +1,7 @@
+product_id,product_name,category,unit_price,launch_date
+101,Widget A,Widgets,25.0,2022-06-01
+102,Widget B,Widgets,45.0,2022-09-15
+103,Gadget X,Gadgets,150.0,2023-01-01
+104,Gadget Y,Gadgets,200.0,2023-03-01
+105,Service Plan S,Services,9.99,2022-01-01
+106,Service Plan M,Services,29.99,2022-01-01

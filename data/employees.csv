@@ -1,0 +1,8 @@
+employee_id,name,manager_id,department,salary
+1,CEO Sara,,Exec,250000
+2,VP Mark,1.0,Sales,180000
+3,VP Lisa,1.0,Engineering,180000
+4,Mgr Tom,2.0,Sales,120000
+5,Mgr Amy,3.0,Engineering,130000
+6,Dev Joe,4.0,Sales,90000
+7,Dev Kim,4.0,Sales,95000
