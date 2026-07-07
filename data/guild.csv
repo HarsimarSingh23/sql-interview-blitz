@@ -1,0 +1,9 @@
+member_id,name,manager_id,guild_hall,power_level
+1,Grandmaster Vale,,Council,9800
+2,Master Ignus,1.0,Pyromancy,7200
+3,Master Sonja,1.0,Cryomancy,7200
+4,Warden Bram,2.0,Pyromancy,5100
+5,Warden Elke,3.0,Cryomancy,5400
+6,Acolyte Pip,4.0,Pyromancy,3100
+7,Acolyte Rune,4.0,Pyromancy,3100
+8,Acolyte Dax,5.0,Cryomancy,2900
