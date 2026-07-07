@@ -1,46 +1,61 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import duckdb
 import pandas as pd
 import os
 from questions import QUESTIONS
 
 # ── Page config ──
-st.set_page_config(page_title="SQL Spellforge Academy", page_icon="🧙", layout="wide")
+st.set_page_config(page_title="Hogwarts School of SQL & Sorcery", page_icon="⚡", layout="wide")
 
-# ── Custom CSS — "Arcane" theme + transitions ──
+# ── Custom CSS — "Hogwarts" theme + transitions ──
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=IM+Fell+English:ital@0;1&display=swap');
 
-    /* Deep-space arcane gradient backdrop */
+    /* Candlelit Great Hall backdrop — deep night, warm hearth glow */
     .stApp {
         background:
-            radial-gradient(circle at 15% 10%, rgba(124, 58, 237, 0.18), transparent 40%),
-            radial-gradient(circle at 85% 20%, rgba(6, 182, 212, 0.14), transparent 45%),
-            radial-gradient(circle at 50% 90%, rgba(236, 72, 153, 0.12), transparent 50%),
-            #0b0714;
+            radial-gradient(circle at 18% 12%, rgba(211, 166, 37, 0.14), transparent 42%),
+            radial-gradient(circle at 82% 16%, rgba(116, 0, 1, 0.28), transparent 46%),
+            radial-gradient(circle at 50% 95%, rgba(211, 166, 37, 0.10), transparent 55%),
+            #1a1410;
         background-attachment: fixed;
     }
 
-    /* Animated glowing hero title */
+    /* Enchanted golden hero title with candle-flicker glow */
     .arcane-title {
         font-family: 'Cinzel', serif;
-        font-size: 2.4em; font-weight: 700; text-align: center;
-        background: linear-gradient(90deg, #a78bfa, #22d3ee, #f472b6, #a78bfa);
+        font-size: 2.6em; font-weight: 900; text-align: center;
+        letter-spacing: 1px;
+        background: linear-gradient(90deg, #b8860b, #f5d67a, #d3a625, #f5d67a, #b8860b);
         background-size: 300% auto;
         -webkit-background-clip: text; background-clip: text;
         -webkit-text-fill-color: transparent;
-        animation: shimmer 6s linear infinite;
+        animation: shimmer 7s linear infinite, flicker 3.5s ease-in-out infinite;
         margin: 0.2em 0;
     }
     @keyframes shimmer { to { background-position: 300% center; } }
+    @keyframes flicker {
+        0%, 100% { filter: drop-shadow(0 0 8px rgba(211,166,37,0.55)); }
+        45%      { filter: drop-shadow(0 0 14px rgba(245,214,122,0.85)); }
+        70%      { filter: drop-shadow(0 0 6px rgba(211,166,37,0.40)); }
+    }
 
+    .subtitle {
+        text-align: center; margin-top: -6px;
+        color: #c9a24b; font-family: 'IM Fell English', serif;
+        font-style: italic; font-size: 1.1em;
+    }
+
+    /* House-banner topic headers — crimson drape with gold trim */
     .topic-header {
-        background: linear-gradient(90deg, rgba(124,58,237,0.35), transparent);
-        border-left: 3px solid #a78bfa;
-        padding: 10px 16px; border-radius: 8px; margin: 14px 0 6px 0;
-        color: #c4b5fd; font-size: 1.15em; font-weight: 600;
-        font-family: 'Cinzel', serif;
+        background: linear-gradient(90deg, rgba(116,0,1,0.55), rgba(116,0,1,0.15) 70%, transparent);
+        border-left: 4px solid #d3a625;
+        padding: 10px 16px; border-radius: 6px; margin: 16px 0 6px 0;
+        color: #f5d67a; font-size: 1.2em; font-weight: 700;
+        font-family: 'Cinzel', serif; letter-spacing: 0.5px;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.35);
         animation: fadeSlide 0.5s ease both;
     }
     @keyframes fadeSlide {
@@ -48,55 +63,60 @@ st.markdown("""
         to   { opacity: 1; transform: translateX(0); }
     }
 
-    .difficulty-easy   { color: #34d399; }
-    .difficulty-medium { color: #fbbf24; }
-    .difficulty-hard   { color: #fb7185; }
+    /* Difficulty = spell-difficulty houses */
+    .difficulty-easy   { color: #d3a625; }   /* Hufflepuff gold */
+    .difficulty-medium { color: #ecb939; }
+    .difficulty-hard   { color: #ae0001; }   /* Gryffindor scarlet */
 
-    /* Expanders: glass panels that lift & glow on hover */
+    /* Expanders: aged-parchment scrolls that lift on hover */
     div[data-testid="stExpander"] {
-        border: 1px solid rgba(167,139,250,0.25);
-        border-radius: 12px; margin-bottom: 8px;
-        background: rgba(255,255,255,0.02);
-        backdrop-filter: blur(6px);
+        border: 1px solid rgba(211,166,37,0.35);
+        border-radius: 8px; margin-bottom: 8px;
+        background: rgba(40, 30, 20, 0.35);
+        backdrop-filter: blur(4px);
         transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     }
     div[data-testid="stExpander"]:hover {
         transform: translateY(-2px);
-        border-color: rgba(167,139,250,0.6);
-        box-shadow: 0 8px 28px rgba(124,58,237,0.28);
+        border-color: rgba(245,214,122,0.75);
+        box-shadow: 0 8px 26px rgba(116,0,1,0.35), 0 0 12px rgba(211,166,37,0.25);
     }
 
+    /* Score boxes = house-point hourglasses */
     .score-box {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(167,139,250,0.25); border-radius: 14px;
+        background: rgba(40, 30, 20, 0.4);
+        border: 1px solid rgba(211,166,37,0.4); border-radius: 10px;
         padding: 16px; text-align: center; margin: 4px;
         transition: transform 0.2s ease, box-shadow 0.25s ease;
     }
     .score-box:hover {
         transform: translateY(-3px) scale(1.03);
-        box-shadow: 0 6px 22px rgba(34,211,238,0.25);
+        box-shadow: 0 6px 22px rgba(211,166,37,0.35);
     }
-    .score-number { font-size: 2em; font-weight: 700; font-family: 'Cinzel', serif; }
+    .score-number { font-size: 2em; font-weight: 900; font-family: 'Cinzel', serif; }
 
-    /* Buttons: subtle arcane hover glow */
+    /* Buttons: brass-and-crimson with warm hover glow */
     .stButton > button {
-        border: 1px solid rgba(167,139,250,0.35);
-        transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        border: 1px solid rgba(211,166,37,0.45);
+        color: #f5d67a;
+        transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
     .stButton > button:hover {
         transform: translateY(-1px);
-        border-color: #a78bfa;
-        box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+        border-color: #f5d67a;
+        background: rgba(116,0,1,0.35);
+        box-shadow: 0 4px 16px rgba(211,166,37,0.4);
     }
 
-    /* Tabs glow when active */
-    .stTabs [data-baseweb="tab"] { transition: color 0.2s ease; }
-    .stTabs [aria-selected="true"] { color: #c4b5fd !important; }
+    /* Tabs glow gold when active */
+    .stTabs [data-baseweb="tab"] { transition: color 0.2s ease; font-family: 'Cinzel', serif; }
+    .stTabs [aria-selected="true"] { color: #f5d67a !important; }
+    .stTabs [data-baseweb="tab-highlight"] { background-color: #d3a625 !important; }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="arcane-title">🧙 SQL Spellforge Academy</div>', unsafe_allow_html=True)
-st.markdown('<p style="text-align:center;color:#8b7fb5;margin-top:-6px;">Master the arcane arts of SQL — wizards, spells, quests & guild lore await.</p>', unsafe_allow_html=True)
+st.markdown('<div class="arcane-title">⚡ Hogwarts School of SQL &amp; Sorcery</div>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">"It is our queries that show what we truly are, far more than our abilities." — cast wisely.</p>', unsafe_allow_html=True)
 
 # ── Data setup ──
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -135,11 +155,129 @@ if "score" not in st.session_state:
     st.session_state.score = {}
 if "show_answer" not in st.session_state:
     st.session_state.show_answer = set()
+if "house_points" not in st.session_state:
+    st.session_state.house_points = 0
+
+
+# ── 🧙‍♂️ Dumbledore awards points (real browser-side JavaScript) ──
+def award_gryffindor(total_points, delta=10):
+    """Inject JS that paints a full-page celebration whenever a query succeeds."""
+    components.html(f"""
+    <script>
+    (function() {{
+        const delta = {delta}, total = {total_points};
+        // Reach into the top Streamlit document so it floats over the WHOLE page,
+        // not just this tiny component iframe.
+        let doc, root;
+        try {{ doc = window.parent.document; root = doc.body; }}
+        catch (e) {{ doc = document; root = document.body; }}
+
+        // Inject keyframes once
+        if (!doc.getElementById('gp-keyframes')) {{
+            const style = doc.createElement('style');
+            style.id = 'gp-keyframes';
+            style.textContent = `
+                @keyframes gpPop  {{ to {{ transform:scale(1); opacity:1; }} }}
+                @keyframes gpFall {{
+                    0%   {{ opacity:0; transform:translateY(-20px) rotate(0deg); }}
+                    12%  {{ opacity:1; }}
+                    100% {{ opacity:0; transform:translateY(105vh) rotate(360deg); }}
+                }}`;
+            doc.head.appendChild(style);
+        }}
+
+        const overlay = doc.createElement('div');
+        overlay.style.cssText = `position:fixed;inset:0;z-index:999999;pointer-events:none;
+            display:flex;align-items:center;justify-content:center;overflow:hidden;
+            font-family:'Cinzel',Georgia,serif;`;
+
+        // Golden sparkles raining down
+        for (let i = 0; i < 44; i++) {{
+            const s = doc.createElement('div');
+            const dur = 2.4 + Math.random()*2, delay = Math.random()*0.7;
+            s.textContent = Math.random() < 0.5 ? '✨' : '⭐';
+            s.style.cssText = `position:absolute;left:${{Math.random()*100}}vw;top:-40px;
+                font-size:${{10 + Math.random()*16}}px;opacity:0;
+                animation:gpFall ${{dur}}s ease-in ${{delay}}s forwards;`;
+            overlay.appendChild(s);
+        }}
+
+        // Wax-sealed proclamation card
+        const card = doc.createElement('div');
+        card.style.cssText = `text-align:center;padding:26px 42px;border-radius:16px;
+            background:radial-gradient(circle at 50% 0%, rgba(116,0,1,0.96), rgba(35,10,10,0.97));
+            border:2px solid #d3a625;box-shadow:0 0 45px rgba(211,166,37,0.7);
+            transform:scale(0.4);opacity:0;animation:gpPop 0.5s cubic-bezier(.2,1.5,.4,1) forwards;`;
+        card.innerHTML = `
+            <div style="font-size:56px;line-height:1;">🧙‍♂️</div>
+            <div style="color:#f5d67a;font-size:27px;font-weight:900;margin-top:8px;letter-spacing:1px;">
+                +${{delta}} POINTS TO GRYFFINDOR!</div>
+            <div style="color:#e8d8a0;font-size:15px;margin-top:6px;font-style:italic;">
+                "Awarded by Prof. Dumbledore for a well-cast query."</div>
+            <div style="color:#d3a625;font-size:14px;margin-top:10px;">
+                🏆 Gryffindor total: <b>${{total}}</b> points</div>
+            <div style="color:#c9a24b;font-size:12px;margin-top:8px;letter-spacing:2px;">
+                🎵 ~ Hedwig's Theme ~ 🎵</div>`;
+        overlay.appendChild(card);
+        root.appendChild(overlay);
+
+        // 🎵 Hedwig's Theme opening motif — synthesized live via WebAudio.
+        // (No copyrighted audio is bundled; the notes are generated on the fly.
+        //  Silently skipped if the browser blocks autoplay.)
+        try {{
+            const ac = new (window.AudioContext || window.webkitAudioContext)();
+            const beat = 0.30;  // seconds per quarter note — slow 3/4 waltz feel
+            // [frequency, duration in beats] — the famous E-minor opening phrase
+            const melody = [
+                [493.88, 1.0],  // B4
+                [659.25, 1.5],  // E5
+                [783.99, 0.5],  // G5
+                [739.99, 1.0],  // F#5
+                [659.25, 2.0],  // E5
+                [987.77, 1.0],  // B5
+                [880.00, 3.0],  // A5
+                [739.99, 3.0],  // F#5
+            ];
+            let t = ac.currentTime + 0.06;
+            for (const [freq, beats] of melody) {{
+                const dur = beats * beat;
+                // Two detuned voices for a warm, bell-like celesta tone
+                [['triangle', 0.11, 0], ['sine', 0.07, 2]].forEach(([type, peak, det]) => {{
+                    const o = ac.createOscillator(), g = ac.createGain();
+                    o.type = type; o.frequency.value = freq; o.detune.value = det;
+                    o.connect(g); g.connect(ac.destination);
+                    g.gain.setValueAtTime(0.0001, t);
+                    g.gain.exponentialRampToValueAtTime(peak, t + 0.02);
+                    g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.95);
+                    o.start(t); o.stop(t + dur);
+                }});
+                t += dur;
+            }}
+        }} catch (e) {{}}
+
+        // Fade out & remove
+        setTimeout(() => {{
+            card.style.transition = 'opacity 0.6s ease';
+            card.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 700);
+        }}, 4200);
+    }})();
+    </script>
+    """, height=0)
 
 # ── Sidebar ──
 with st.sidebar:
-    st.title("🧙 Spellforge Academy")
-    st.markdown("**Master SQL through the arcane arts**")
+    st.title("⚡ Hogwarts SQL")
+    st.markdown("**School of SQL & Sorcery**")
+
+    # 🏆 Gryffindor house-points hourglass
+    st.markdown(
+        f'''<div class="score-box" style="border-color:#ae0001;background:rgba(116,0,1,0.28);margin-top:10px;">
+        <div style="font-size:0.8em;color:#d3a625;letter-spacing:2px;">🏆 GRYFFINDOR</div>
+        <div class="score-number" style="color:#f5d67a;">{st.session_state.house_points}</div>
+        <div style="font-size:0.75em;color:#c9a24b;">house points</div></div>''',
+        unsafe_allow_html=True,
+    )
     st.divider()
 
     # Score summary
@@ -170,6 +308,7 @@ with st.sidebar:
     if st.button("🔄 Reset Progress", use_container_width=True):
         st.session_state.score = {}
         st.session_state.show_answer = set()
+        st.session_state.house_points = 0
         st.rerun()
 
 # ── Main Area ──
@@ -223,9 +362,11 @@ with tab1:
                         try:
                             result = con.execute(user_sql).fetchdf()
                             st.dataframe(result, use_container_width=True)
-                            st.session_state.score[qid] = st.session_state.score.get(qid, "attempted")
-                            if st.session_state.score[qid] != "solved":
+                            if st.session_state.score.get(qid) != "solved":
                                 st.session_state.score[qid] = "attempted"
+                            # 🧙‍♂️ A successful cast earns Gryffindor 10 points
+                            st.session_state.house_points += 10
+                            award_gryffindor(st.session_state.house_points)
                         except Exception as e:
                             st.error(f"❌ Error: {e}")
                     else:
@@ -270,6 +411,9 @@ with tab2:
                 result = con.execute(free_sql).fetchdf()
                 st.success(f"✅ {len(result)} rows returned")
                 st.dataframe(result, use_container_width=True)
+                # 🧙‍♂️ A successful cast earns Gryffindor 10 points
+                st.session_state.house_points += 10
+                award_gryffindor(st.session_state.house_points)
             except Exception as e:
                 st.error(f"❌ {e}")
         else:
