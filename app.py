@@ -5,28 +5,98 @@ import os
 from questions import QUESTIONS
 
 # ── Page config ──
-st.set_page_config(page_title="SQL Interview Practice", page_icon="🧑‍💻", layout="wide")
+st.set_page_config(page_title="SQL Spellforge Academy", page_icon="🧙", layout="wide")
 
-# ── Custom CSS ──
+# ── Custom CSS — "Arcane" theme + transitions ──
 st.markdown("""
 <style>
-    .stApp { background-color: #0e1117; }
-    .topic-header { 
-        background: linear-gradient(90deg, #1e3a5f, #0e1117);
-        padding: 8px 16px; border-radius: 8px; margin: 8px 0;
-        color: #58a6ff; font-size: 1.1em; font-weight: 600;
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap');
+
+    /* Deep-space arcane gradient backdrop */
+    .stApp {
+        background:
+            radial-gradient(circle at 15% 10%, rgba(124, 58, 237, 0.18), transparent 40%),
+            radial-gradient(circle at 85% 20%, rgba(6, 182, 212, 0.14), transparent 45%),
+            radial-gradient(circle at 50% 90%, rgba(236, 72, 153, 0.12), transparent 50%),
+            #0b0714;
+        background-attachment: fixed;
     }
-    .difficulty-easy { color: #3fb950; }
-    .difficulty-medium { color: #d29922; }
-    .difficulty-hard { color: #f85149; }
-    div[data-testid="stExpander"] { border: 1px solid #30363d; border-radius: 8px; margin-bottom: 4px; }
+
+    /* Animated glowing hero title */
+    .arcane-title {
+        font-family: 'Cinzel', serif;
+        font-size: 2.4em; font-weight: 700; text-align: center;
+        background: linear-gradient(90deg, #a78bfa, #22d3ee, #f472b6, #a78bfa);
+        background-size: 300% auto;
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer 6s linear infinite;
+        margin: 0.2em 0;
+    }
+    @keyframes shimmer { to { background-position: 300% center; } }
+
+    .topic-header {
+        background: linear-gradient(90deg, rgba(124,58,237,0.35), transparent);
+        border-left: 3px solid #a78bfa;
+        padding: 10px 16px; border-radius: 8px; margin: 14px 0 6px 0;
+        color: #c4b5fd; font-size: 1.15em; font-weight: 600;
+        font-family: 'Cinzel', serif;
+        animation: fadeSlide 0.5s ease both;
+    }
+    @keyframes fadeSlide {
+        from { opacity: 0; transform: translateX(-12px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .difficulty-easy   { color: #34d399; }
+    .difficulty-medium { color: #fbbf24; }
+    .difficulty-hard   { color: #fb7185; }
+
+    /* Expanders: glass panels that lift & glow on hover */
+    div[data-testid="stExpander"] {
+        border: 1px solid rgba(167,139,250,0.25);
+        border-radius: 12px; margin-bottom: 8px;
+        background: rgba(255,255,255,0.02);
+        backdrop-filter: blur(6px);
+        transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    div[data-testid="stExpander"]:hover {
+        transform: translateY(-2px);
+        border-color: rgba(167,139,250,0.6);
+        box-shadow: 0 8px 28px rgba(124,58,237,0.28);
+    }
+
     .score-box {
-        background: #161b22; border: 1px solid #30363d; border-radius: 12px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(167,139,250,0.25); border-radius: 14px;
         padding: 16px; text-align: center; margin: 4px;
+        transition: transform 0.2s ease, box-shadow 0.25s ease;
     }
-    .score-number { font-size: 2em; font-weight: 700; }
+    .score-box:hover {
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 6px 22px rgba(34,211,238,0.25);
+    }
+    .score-number { font-size: 2em; font-weight: 700; font-family: 'Cinzel', serif; }
+
+    /* Buttons: subtle arcane hover glow */
+    .stButton > button {
+        border: 1px solid rgba(167,139,250,0.35);
+        transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        border-color: #a78bfa;
+        box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+    }
+
+    /* Tabs glow when active */
+    .stTabs [data-baseweb="tab"] { transition: color 0.2s ease; }
+    .stTabs [aria-selected="true"] { color: #c4b5fd !important; }
 </style>
 """, unsafe_allow_html=True)
+
+st.markdown('<div class="arcane-title">🧙 SQL Spellforge Academy</div>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center;color:#8b7fb5;margin-top:-6px;">Master the arcane arts of SQL — wizards, spells, quests & guild lore await.</p>', unsafe_allow_html=True)
 
 # ── Data setup ──
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -35,7 +105,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 def get_connection():
     """Create DuckDB in-memory DB and load CSVs as tables."""
     con = duckdb.connect(":memory:")
-    for csv_file in ["customers", "products", "orders", "order_items", "employees", "monthly_metrics"]:
+    for csv_file in ["wizards", "spells", "quests", "quest_casts", "guild", "realm_metrics"]:
         path = os.path.join(DATA_DIR, f"{csv_file}.csv")
         if os.path.exists(path):
             con.execute(f"CREATE TABLE {csv_file} AS SELECT * FROM read_csv_auto('{path}')")
@@ -48,7 +118,7 @@ def show_table_previews():
     """Render expandable table previews."""
     st.markdown("---")
     st.subheader("📊 Quick Table Reference")
-    tables = ["customers", "products", "orders", "order_items", "employees", "monthly_metrics"]
+    tables = ["wizards", "spells", "quests", "quest_casts", "guild", "realm_metrics"]
     cols = st.columns(3)
     for i, table in enumerate(tables):
         with cols[i % 3]:
@@ -68,8 +138,8 @@ if "show_answer" not in st.session_state:
 
 # ── Sidebar ──
 with st.sidebar:
-    st.title("🧑‍💻 SQL Practice Tool")
-    st.markdown("**Self-practice for SQL interviews**")
+    st.title("🧙 Spellforge Academy")
+    st.markdown("**Master SQL through the arcane arts**")
     st.divider()
 
     # Score summary
@@ -94,7 +164,7 @@ with st.sidebar:
 
     st.divider()
     st.markdown("### 📊 Tables Available")
-    for t in ["customers", "products", "orders", "order_items", "employees", "monthly_metrics"]:
+    for t in ["wizards", "spells", "quests", "quest_casts", "guild", "realm_metrics"]:
         st.code(t, language="text")
 
     if st.button("🔄 Reset Progress", use_container_width=True):
@@ -107,7 +177,7 @@ tab1, tab2, tab3, tab4 = st.tabs(["📝 Questions", "🔍 Free SQL Editor", "�
 
 # ═══════════════════════ TAB 1: Questions ═══════════════════════
 with tab1:
-    st.header("SQL Interview Questions")
+    st.header("📜 Spellbook Challenges")
 
     # Show/hide table data
     if st.toggle("👀 Show Table Data", key="show_tables_q", value=False):
@@ -192,7 +262,7 @@ with tab2:
         st.markdown("---")
 
     free_sql = st.text_area("SQL Query:", height=200, key="free_sql",
-                             placeholder="SELECT * FROM customers LIMIT 5;")
+                             placeholder="SELECT * FROM wizards LIMIT 5;")
     
     if st.button("▶️ Execute", key="free_run", use_container_width=True):
         if free_sql.strip():
@@ -228,7 +298,7 @@ with tab3:
     st.header("📊 Data Explorer")
     st.markdown("Browse all available tables and their schemas.")
 
-    tables = ["customers", "products", "orders", "order_items", "employees", "monthly_metrics"]
+    tables = ["wizards", "spells", "quests", "quest_casts", "guild", "realm_metrics"]
     
     for table in tables:
         with st.expander(f"📋 {table}"):

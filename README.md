@@ -1,4 +1,4 @@
-# 🧑‍💻 SQL Interview Blitz — Practice SQL Like a Pro
+# 🧙 SQL Spellforge Academy — Master SQL Through the Arcane Arts
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.9+-blue?logo=python&logoColor=white" />
@@ -16,7 +16,7 @@
 
 ## 🎯 What Is This?
 
-**SQL Interview Blitz** is an interactive, offline-first SQL practice environment built with Streamlit + DuckDB. It loads realistic CSV datasets into an in-memory database so you can write and run real SQL queries — right in your browser.
+**SQL Spellforge Academy** is an interactive, offline-first SQL practice environment built with Streamlit + DuckDB. Instead of yet another boring customers-and-orders schema, you query a **magic-RPG world**: wizards and their mentors, castable spells, perilous quests, a ranked guild hierarchy, and monthly realm metrics. The data is packed with deliberate edge cases — NULL home realms, self-taught wizards, failed/abandoned quests, tied power levels, and orphan mentor chains — so every join, window, and NULL trap actually bites.
 
 Perfect for:
 - 🎓 **Students** preparing for database exams
@@ -29,40 +29,45 @@ Perfect for:
 
 | Feature | Description |
 |---------|-------------|
-| 📝 **22 Curated Questions** | Covers JOINs, aggregation, window functions, CTEs, and more |
+| 📝 **34 Curated Questions** | JOINs, aggregation, window functions, subqueries, recursive CTEs, and more |
 | 🖥️ **In-Browser SQL Editor** | Write & run queries instantly — powered by DuckDB |
-| 📊 **6 Realistic Tables** | Customers, Products, Orders, Employees, Monthly Metrics |
+| 📊 **6 Themed Tables** | Wizards, Spells, Quests, Quest Casts, Guild, Realm Metrics |
 | 💡 **Hints & Answers** | Toggle hints, reveal reference answers with output |
 | 🏆 **Progress Tracker** | Mark questions solved, filter by topic/difficulty |
 | 🔍 **Free SQL Sandbox** | Open editor to experiment with any query |
 | 📖 **SQL Tricks Booklet** | Built-in cheat sheet with visual explanations |
-| 🌙 **Dark Theme** | Easy on the eyes during late-night grinding |
+| 🔮 **Arcane Theme** | Animated glowing UI with hover transitions & glass panels |
 
 ---
 
 ## 🗂️ Topics Covered
 
 ```
-┌─────────────────────────────────────────────────┐
-│  JOIN Edge Cases          │  NULLs, Self-Join,  │
-│                           │  FULL OUTER JOIN     │
+┌───────────────────────────┬──────────────────────┐
+│  JOIN Edge Cases          │  NULLs, Self-Join,   │
+│                           │  FULL OUTER, CROSS   │
 ├───────────────────────────┼──────────────────────┤
-│  Revenue Calculations     │  Multi-table JOINs,  │
-│                           │  COALESCE, discounts │
-├───────────────────────────┼──────────────────────┤
-│  Aggregation              │  GROUP BY, HAVING,   │
-│                           │  Top-N, CASE WHEN    │
+│  Gold & Aggregation       │  Multi-table JOINs,  │
+│                           │  COALESCE, HAVING,   │
+│                           │  conditional pivots  │
 ├───────────────────────────┼──────────────────────┤
 │  Ranking Functions        │  ROW_NUMBER, RANK,   │
-│                           │  DENSE_RANK          │
+│                           │  DENSE_RANK, NTILE   │
 ├───────────────────────────┼──────────────────────┤
-│  Value Functions          │  LAG, LEAD           │
+│  Value Functions          │  LAG, LEAD,          │
+│                           │  FIRST_VALUE         │
 ├───────────────────────────┼──────────────────────┤
-│  Window Aggregations      │  Running total,      │
+│  Aggregation Windows      │  Running total,      │
 │                           │  Moving average,     │
 │                           │  PARTITION BY,       │
 │                           │  ROWS BETWEEN,       │
 │                           │  PERCENTILE_CONT     │
+├───────────────────────────┼──────────────────────┤
+│  Subqueries & CTEs        │  EXISTS, correlated, │
+│                           │  RECURSIVE CTEs      │
+├───────────────────────────┼──────────────────────┤
+│  Strings, Dates & Sets    │  SPLIT_PART, EXTRACT,│
+│                           │  EXCEPT / UNION      │
 ├───────────────────────────┼──────────────────────┤
 │  Interview Combos         │  Mixed real-world    │
 │                           │  scenarios           │
@@ -101,7 +106,7 @@ Open **http://localhost:8501** and start practicing! 🎉
 > Open sandbox to test any query. Built-in syntax reference card.
 
 ### Data Explorer
-> Browse schemas and data for all 6 tables before writing queries.
+> Browse schemas and data for all 6 themed tables before writing queries.
 
 ---
 
@@ -110,17 +115,17 @@ Open **http://localhost:8501** and start practicing! 🎉
 ```
 sql-interview-blitz/
 ├── app.py              # Main Streamlit application
-├── questions.py        # 22 curated SQL questions with answers
+├── questions.py        # 34 curated SQL questions with answers
 ├── generate_data.py    # Script to generate CSV datasets
 ├── sql_tricks.md       # 📖 SQL Tricks Booklet (read it!)
 ├── requirements.txt    # Python dependencies
 ├── data/               # Generated CSV files
-│   ├── customers.csv
-│   ├── products.csv
-│   ├── orders.csv
-│   ├── order_items.csv
-│   ├── employees.csv
-│   └── monthly_metrics.csv
+│   ├── wizards.csv
+│   ├── spells.csv
+│   ├── quests.csv
+│   ├── quest_casts.csv
+│   ├── guild.csv
+│   └── realm_metrics.csv
 └── README.md
 ```
 

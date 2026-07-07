@@ -1,0 +1,13 @@
+wizard_id,name,house,home_realm,tier,enrolled_date,mentor_id
+1,Zara Emberveil,Emberfall,Pyrelands,Archmage,1023-01-15,
+2,Kael Frostborn,Frostspire,Glaciern,Adept,1023-02-20,1.0
+3,Lyra Starweaver,Starweave,Astra,Archmage,1023-01-10,
+4,Doran Ashfell,Emberfall,Pyrelands,Adept,1023-03-05,2.0
+5,Nyx Shadowmere,Voidwatch,,Novice,1023-04-12,3.0
+6,Orin Brightwood,Starweave,Astra,Mystic,1023-05-01,
+7,Sable Thornquist,Frostspire,Glaciern,Adept,1023-06-18,4.0
+8,Vex Ironmoon,Voidwatch,,Archmage,1023-02-28,1.0
+9,Mira Duskbloom,Emberfall,Pyrelands,Mystic,1023-07-22,3.0
+10,Rowan Stormcaller,Frostspire,Glaciern,Novice,1023-08-10,5.0
+11,Thea Voidwhisper,Voidwatch,,Adept,1023-09-03,8.0
+12,Cassius Grim,Starweave,Astra,Novice,1023-10-19,

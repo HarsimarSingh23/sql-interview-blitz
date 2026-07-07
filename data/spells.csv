@@ -1,0 +1,9 @@
+spell_id,spell_name,school,mana_cost,discovered_date
+101,Ember Lance,Pyromancy,25.0,1018-06-01
+102,Cinder Storm,Pyromancy,45.0,1019-09-15
+103,Frost Nova,Cryomancy,30.0,1020-01-01
+104,Glacial Spear,Cryomancy,60.0,1021-03-01
+105,Arcane Bolt,Arcane,15.0,1015-01-01
+106,Void Rift,Arcane,120.0,1022-11-11
+107,Soul Harvest,Necromancy,200.0,1017-10-31
+108,Mana Shield,Abjuration,10.0,1010-01-01
